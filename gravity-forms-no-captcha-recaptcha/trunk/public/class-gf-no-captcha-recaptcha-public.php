@@ -252,8 +252,22 @@ class GFNoCaptchaReCaptcha_Public {
 
 				if ( ( $field['type'] == $this->gravity_forms_field_type ) && ! empty( $this->google_public_key ) ) {
 
+					$locale = '';
+
+					// get site's language if polylang is active
+					if( function_exists( 'pll_current_language' ) ) {
+						$locale = pll_current_language();
+					}
+
+					// let plugins and themes do their own language logic
+					$locale = apply_filters( 'gravity_forms_recaptcha_locale', $locale );
+
+					if( !empty( $locale ) ) {
+						$locale = '&hl=' . esc_attr( $locale );
+					}
+
 					// Enqueue External API JS
-					wp_enqueue_script( 'no_captcha_recaptcha_api', 'https://www.google.com/recaptcha/api.js?render=explicit', array(), '', true );
+					wp_enqueue_script( 'no_captcha_recaptcha_api', 'https://www.google.com/recaptcha/api.js?render=explicit' . $locale, array(), '', true );
 
 					// Enqueue Internal JS (renders CAPTCHA explicitly - maintains AJAX submission compatibility)
 					wp_enqueue_script( 'no_captcha_recaptcha_internal', plugin_dir_url( __FILE__ ) . 'js/gf-no-captcha-recaptcha-public.js', array(
